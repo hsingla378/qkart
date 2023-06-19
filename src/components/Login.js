@@ -1,4 +1,4 @@
-import { Button, CircularProgress, Stack, TextField } from "@mui/material";
+import { Button, LinearProgress, Stack, TextField } from "@mui/material";
 import { Box } from "@mui/system";
 import axios from "axios";
 import { useSnackbar } from "notistack";
@@ -10,18 +10,13 @@ import Header from "./Header";
 import "./Login.css";
 
 const Login = () => {
-  const history = useHistory();
   const { enqueueSnackbar } = useSnackbar();
-  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     username: "",
-    password: "",
+    password: ""
   });
-
-  const handleInput = (e) => {
-    const [key, value] = [e.target.name, e.target.value];
-    setFormData({ ...formData, [key]: value });
-  };
+  const [isLoading, setIsLoading] = useState(false);
+  const history = useHistory();
 
   // TODO: CRIO_TASK_MODULE_LOGIN - Fetch the API response
   /**
@@ -49,40 +44,31 @@ const Login = () => {
    *
    */
   const login = async (formData) => {
-    console.log(formData);
-    if (!validateInput(formData)) return;
-
-    setLoading(true);
-
+    if(!validateInput(formData)) return
+    console.log(formData)
+    setIsLoading(true)
     try {
-      const response = await axios.post(
-        `${config.endpoint}/auth/login`,
-        formData
-      );
+      let res = await axios.post(`${config.endpoint}/auth/login`, {
+        "username": formData.username,
+        "password": formData.password
+      })
 
-      persistLogin(
-        response.data.token,
-        response.data.username,
-        response.data.balance
-      );
-
-      setFormData({
-        username: "",
-        password: "",
-      });
-      setLoading(false);
-      enqueueSnackbar("Logged in", { variant: "success" });
-      history.push("/");
-    } catch (e) {
-      setLoading(false);
-      if (e.response && e.response.status === 400) {
-        return enqueueSnackbar(e.response.data.message, { variant: "error" });
+      if(res.status === 201){
+        enqueueSnackbar("Logged in successfully", { variant: "success" })
+      }
+      persistLogin(res.data.token, res.data.username, res.data.balance)
+      setIsLoading(false)
+      history.push("/")
+    } catch(error) {
+      if (error.response && error.response.status === 400) {
+        enqueueSnackbar(error.response.data.message, { variant: "error" });
       } else {
-      return  enqueueSnackbar(
-          "Something went wrong. check that the backend is running, reachable and return valid JSON.",
+        enqueueSnackbar(
+          "Something went wrong. Check that the backend is running, reachable, and returns valid JSON.",
           { variant: "error" }
         );
       }
+      setIsLoading(false)
     }
   };
 
@@ -102,15 +88,14 @@ const Login = () => {
    * -    Check that password field is not an empty value - "Password is a required field"
    */
   const validateInput = (data) => {
-    if (!data.username) {
-      enqueueSnackbar("Username is required field", { variant: "warning" });
-      return false;
+    if(!data.username.length) {
+      enqueueSnackbar("Username is a required field", {variant: "warning"})
+      return false
+    } else if (!data.password.length) {
+      enqueueSnackbar("Password is a required field", {variant: "warning"})
+      return false
     }
-    if (!data.password) {
-      enqueueSnackbar("Password is a required field", { variant: "warning" });
-      return false;
-    }
-    return true;
+    return true
   };
 
   // TODO: CRIO_TASK_MODULE_LOGIN - Persist user's login information
@@ -133,6 +118,7 @@ const Login = () => {
     localStorage.setItem("token", token);
     localStorage.setItem("username", username);
     localStorage.setItem("balance", balance);
+    return
   };
 
   return (
@@ -147,49 +133,46 @@ const Login = () => {
         <Stack spacing={2} className="form">
           <h2 className="title">Login</h2>
           <TextField
-            id="username"
-            label="Username"
-            variant="outlined"
-            title="Username"
-            name="username"
-            placeholder="Enter Username"
-            fullWidth
-            value={formData.username}
-            onChange={handleInput}
+          id="username"
+          label="Username"
+          variant="outlined"
+          title="Username"
+          name="username"
+          placeholder="Enter username"
+          fullWidth
+          onChange={(e) =>
+            setFormData({ ...formData, username: e.target.value })
+          }
           />
           <TextField
-            id="password"
-            variant="outlined"
-            label="Password"
-            name="password"
-            type="password"
-            // helperText="Password must be atleast 6 characters length"
-            fullWidth
-            placeholder="Enter a password with minimum 6 characters"
-            value={formData.password}
-            onChange={handleInput}
+          id="password"
+          variant="outlined"
+          title="Password"
+          label="Password"
+          name="password"
+          type="password"
+          fullWidth
+          placeholder="Enter password"
+          onChange={(e) =>
+            setFormData({ ...formData, password: e.target.value })
+          }
           />
-
-          {loading ? (
-            <Box display="flex" justifyContent="center" alignItems="center">
-              <CircularProgress size={25} color="primary" />
-            </Box>
+          {isLoading ? (
+            <LinearProgress />
           ) : (
             <Button
               className="button"
               variant="contained"
-              onClick={async () => {
-                await login(formData);
-              }}
+              onClick={async () => await login(formData)}
             >
               LOGIN TO QKART
             </Button>
           )}
           <p className="secondary-action">
-            Don't have an account?{" "}
-            <a className="link" href="/register">
-              Register now
-            </a>
+          Don’t have an account?{" "}
+            <Link to="/register" className="link">
+            Register now
+            </Link>
           </p>
         </Stack>
       </Box>

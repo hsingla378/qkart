@@ -1,17 +1,16 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
-import { ThemeProvider } from "@emotion/react";
-import theme from "./theme";
 import App from "./App";
 import { SnackbarProvider } from "notistack";
 import { BrowserRouter } from "react-router-dom";
+import { ThemeProvider } from "@mui/system";
+import theme from "./theme";
 
-// TODO: CRIO_TASK_MODULE_REGISTER - Add Target container ID (refer public/index.html)
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
-      <ThemeProvider theme={theme}>
+    <ThemeProvider theme={theme}>
         <SnackbarProvider
           maxSnack={1}
           anchorOrigin={{
@@ -22,8 +21,8 @@ ReactDOM.render(
         >
           <App />
         </SnackbarProvider>
-      </ThemeProvider>
-    </BrowserRouter>
+        </ThemeProvider>
+        </BrowserRouter>
   </React.StrictMode>,
-  document.getElementById("root")
+   document.getElementById('root')
 );

@@ -31,8 +31,8 @@
     "resetMocks": false
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build && cp _redirects build/_redirects",
+    "start": "PORT=8081 react-scripts start",
+    "build": "react-scripts build",
     "test": "react-scripts test --json --outputFile=testReport.json --watchAll=false",
     "eject": "react-scripts eject"
   },

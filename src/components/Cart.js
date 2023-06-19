@@ -37,7 +37,7 @@ import "./Cart.css";
 /**
  * Returns the complete data on all products in cartData by searching in productsData
  *
- * @param { Array.<{ productId: String, qty: Number }> } cartData
+ * @param { Array.<{ productId: WString, qty: Number }> } cartData
  *    Array of objects with productId and quantity of products in cart
  *
  * @param { Array.<Product> } productsData
@@ -47,16 +47,6 @@ import "./Cart.css";
  *    Array of objects with complete data on products in cart
  *
  */
-// export const generateCartItemsFrom = (cartData, productsData) => {
-//   if (!cartData) return;
-//   const nextCart = cartData.map((item) => ({
-//     ...item,
-//     ...productsData.find((product) => item.productId === product._id),
-//   }));
-//   return nextCart;
-// };
-
-
 export const generateCartItemsFrom = (cartData, productsData) => {
   if (!cartData) return;
 
@@ -64,7 +54,7 @@ export const generateCartItemsFrom = (cartData, productsData) => {
     ...item,
     ...productsData.find((product) => item.productId === product._id),
   }));
-  console.log(nextCart);
+
   return nextCart;
 };
 
@@ -79,12 +69,10 @@ export const generateCartItemsFrom = (cartData, productsData) => {
  *
  */
 export const getTotalCartValue = (items = []) => {
-  if (!items.length) return 0;
-  const total = items
-    .map((item) => item.cost * item.qty)
-    .reduce((total, n) => total + n);
+  if (!items.length) return 0
 
-  return total; 
+  const total = items.map((item) => item.cost * item.qty).reduce((total, n) => total + n)
+  return total
 };
 
 /**
@@ -105,6 +93,7 @@ const ItemQuantity = ({ value, handleAdd, handleDelete, isReadOnly = false }) =>
   if(isReadOnly){
     return <Box>Qty: {value}</Box>
   }
+
   return (
     <Stack direction="row" alignItems="center">
       <IconButton size="small" color="primary" onClick={handleDelete}>
@@ -135,8 +124,8 @@ const ItemQuantity = ({ value, handleAdd, handleDelete, isReadOnly = false }) =>
  *
  */
 const Cart = ({ products, items = [], handleQuantity, isReadOnly = false }) => {
-  const token = localStorage.getItem('token');
-  const history = useHistory();
+  const history = useHistory()
+  const token = localStorage.getItem("token")
   if (!items.length) {
     return (
       <Box className="cart empty">
@@ -155,59 +144,61 @@ const Cart = ({ products, items = [], handleQuantity, isReadOnly = false }) => {
         {items.map((item) => (
           <Box key={item.productId}>
             {item.qty > 0 ?
-          <Box display="flex" alignItems="flex-start" padding="1rem">
-            <Box className="image-container">
-              <img
-                // Add product image
-                src={item.image}
-                // Add product name as alt eext
-                alt={item.name}
-                width="100%"
-                height="100%"
-              />
-            </Box>
-            <Box
-              display="flex"
-              flexDirection="column"
-              justifyContent="space-between"
-              height="6rem"
-              paddingX="1rem"
-            >
-              <div>{item.name}</div>
-              <Box
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center"
-              >
-                <ItemQuantity isReadOnly={isReadOnly} value={item.qty}
-                // Add required props by checking implementation
-                handleAdd = {() => {
-                  handleQuantity(
-                    token,
-                    items,
-                    item.productId,
-                    products,
-                    item.qty + 1
-                  );
-                }}
-                handleDelete = {() => {
-                  handleQuantity(
-                    token,
-                    items,
-                    item.productId,
-                    products,
-                    item.qty - 1
-                  );
-                }}
-                />
-                <Box padding="0.5rem" fontWeight="700">
-                  ${item.cost}
+              <Box display="flex" alignItems="flex-start" padding="1rem">
+                <Box className="image-container">
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    width="100%"
+                    height="100%"
+                  />
+                </Box>
+                <Box
+                  display="flex"
+                  flexDirection="column"
+                  justifyContent="space-between"
+                  height="6rem"
+                  paddingX="1rem"
+                >
+                  <div>{item.name}</div>
+                  <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
+                    <ItemQuantity
+                      value={item.qty}
+                      handleAdd={async () => {
+                        await handleQuantity(
+                          token,
+                          items,
+                          item.productId,
+                          products,
+                          item.qty + 1
+                        );
+                      }}
+                      handleDelete={async () => {
+                        await handleQuantity(
+                          token,
+                          items,
+                          item.productId,
+                          products,
+                          item.qty - 1
+                        );
+                      }}
+                      isReadOnly={isReadOnly}
+                    />
+                    <Box padding="0.5rem" fontWeight="700">
+                      ${item.cost}
+                    </Box>
+                  </Box>
                 </Box>
               </Box>
-            </Box>
-          </Box> : null}
+              :
+              null}
           </Box>
-        ))}
+        ))
+        }
         <Box
           padding="1rem"
           display="flex"
