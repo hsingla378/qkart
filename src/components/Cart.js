@@ -58,6 +58,8 @@ export const generateCartItemsFrom = (cartData, productsData) => {
   return nextCart;
 };
 
+// Adding comment to push the code (remove .git file)
+
 /**
  * Get the total value of all products added to the cart
  *
