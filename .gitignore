@@ -30,3 +30,6 @@ pnpm-lock.yaml
 
 # Local Netlify folder
 .netlify
+
+db
+config.json
